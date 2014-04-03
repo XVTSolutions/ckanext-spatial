@@ -1,7 +1,7 @@
 ==============================================
 ckanext-spatial - Geo related plugins for CKAN
 ==============================================
-
+Modified for use with the vdoj_spatial field.
 
 This extension contains plugins that add geospatial capabilities to CKAN_,
 including:
