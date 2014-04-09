@@ -85,11 +85,17 @@ class SpatialMetadata(p.SingletonPlugin):
                         log.debug('Received: %r' % extra.value)
                         geometry = json.loads(extra.value)
                     except ValueError,e:
-                        error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
-                        raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
+                        #Value is not GeoJson... delete extent
+                        save_package_extent(package.id,None)
+                        break
+                        #error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
+                        #raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
                     except TypeError,e:
-                        error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
-                        raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
+                        #Value is not GeoJson... delete extent
+                        save_package_extent(package.id,None)
+                        break
+                        #error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
+                        #raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
 
                     try:
                         save_package_extent(package.id,geometry)
