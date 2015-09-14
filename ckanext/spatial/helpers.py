@@ -3,6 +3,7 @@ from pylons import config
 
 from ckan import plugins as p
 from ckan.lib import helpers as h
+from ckan.lib.helpers import json
 
 log = logging.getLogger(__name__)
 
@@ -66,3 +67,10 @@ def get_common_map_config():
     '''
     namespace = 'ckanext.spatial.common_map.'
     return dict([(k.replace(namespace, ''), v) for k, v in config.iteritems() if k.startswith(namespace)])
+def spatial_is_json(spatial_data):
+    try:
+        json_object = json.loads(spatial_data)
+    except (ValueError, TypeError):
+        return False
+    return True
+

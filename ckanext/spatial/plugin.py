@@ -86,20 +86,14 @@ class SpatialMetadata(p.SingletonPlugin):
                         geometry = json.loads(extra.value)
                     except ValueError,e:
                         #Value is not GeoJson... delete extent
-                        #save_package_extent(package.id,None)
-                        #break
-                        error_dict = {'vdoj_spatial':[u'Error creating geometry: %s' % str(e)]}
-                        raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
+                        save_package_extent(package.id,None)
+                        break
                         #error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
                         #raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
                     except TypeError,e:
                         #Value is not GeoJson... delete extent
-                        #save_package_extent(package.id,None)
-                        #break
-                        if bool(os.getenv('DEBUG')):
-                            raise
-                        error_dict = {'vdoj_spatial':[u'Error: %s' % str(e)]}
-                        raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
+                        save_package_extent(package.id,None)
+                        break
                         #error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
                         #raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
 
@@ -133,6 +127,7 @@ class SpatialMetadata(p.SingletonPlugin):
                 'get_reference_date' : spatial_helpers.get_reference_date,
                 'get_responsible_party': spatial_helpers.get_responsible_party,
                 'get_common_map_config' : spatial_helpers.get_common_map_config,
+                'spatial_is_json' : spatial_helpers.spatial_is_json,
                 }
 
 class SpatialQuery(p.SingletonPlugin):

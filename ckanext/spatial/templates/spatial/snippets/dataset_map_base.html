@@ -23,6 +23,6 @@ extent
       </div>
     </div>
 
-    {% if extent %}
+    {% if extent and h.spatial_is_json(extent) %}
         {% resource 'ckanext-spatial/dataset_map' %}
     {% endif %}
