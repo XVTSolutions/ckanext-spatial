@@ -15,7 +15,12 @@ from ckan.lib.helpers import json
 from ckanext.spatial.lib import save_package_extent,validate_bbox, bbox_query, bbox_query_ordered
 from ckanext.spatial.model.package_extent import setup as setup_model
 
+from ckanext.spatial import helpers as spatial_helpers
+
 log = getLogger(__name__)
+
+def _debug_mode():
+    return config.get('debug', False)
 
 def package_error_summary(error_dict):
     ''' Do some i18n stuff on the error_dict keys '''
@@ -79,8 +84,12 @@ class SpatialMetadata(p.SingletonPlugin):
 
         # TODO: deleted extra
         for extra in package.extras_list:
-            if extra.key == 'vdoj_spatial':
+            if spatial_helpers.spatial_is_spatial_key(extra.key):
                 if extra.state == 'active' and extra.value:
+                    if spatial_helpers.spatial_is_json(extra.value) and not spatial_helpers.spatial_is_geojson(json.loads(extra.value)):
+                        error_dict = {spatial_helpers.spatial_get_spatial_key():[u'Error creating geometry: Context does not provide geo interface']}
+                        raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
+
                     try:
                         log.debug('Received: %r' % extra.value)
                         geometry = json.loads(extra.value)
@@ -88,25 +97,25 @@ class SpatialMetadata(p.SingletonPlugin):
                         #Value is not GeoJson... delete extent
                         save_package_extent(package.id,None)
                         break
-                        #error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
+                        #error_dict = {spatial_helpers.spatial_get_spatial_key():[u'Error decoding JSON object: %s' % str(e)]}
                         #raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
                     except TypeError,e:
                         #Value is not GeoJson... delete extent
                         save_package_extent(package.id,None)
                         break
-                        #error_dict = {'vdoj_spatial':[u'Error decoding JSON object: %s' % str(e)]}
+                        #error_dict = {spatial_helpers.spatial_get_spatial_key():[u'Error decoding JSON object: %s' % str(e)]}
                         #raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
 
                     try:
                         save_package_extent(package.id,geometry)
 
                     except ValueError,e:
-                        error_dict = {'vdoj_spatial':[u'Error creating geometry: %s' % str(e)]}
+                        error_dict = {spatial_helpers.spatial_get_spatial_key():[u'Error creating geometry: %s' % str(e)]}
                         raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
                     except Exception, e:
                         if bool(os.getenv('DEBUG')):
                             raise
-                        error_dict = {'vdoj_spatial':[u'Error: %s' % str(e)]}
+                        error_dict = {spatial_helpers.spatial_get_spatial_key():[u'Error: %s' % str(e)]}
                         raise p.toolkit.ValidationError(error_dict, error_summary=package_error_summary(error_dict))
 
                 elif (extra.state == 'active' and not extra.value) or extra.state == 'deleted':
@@ -122,7 +131,6 @@ class SpatialMetadata(p.SingletonPlugin):
     ## ITemplateHelpers
 
     def get_helpers(self):
-        from ckanext.spatial import helpers as spatial_helpers
         return {
                 'get_reference_date' : spatial_helpers.get_reference_date,
                 'get_responsible_party': spatial_helpers.get_responsible_party,

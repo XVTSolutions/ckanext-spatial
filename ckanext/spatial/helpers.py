@@ -4,6 +4,8 @@ from pylons import config
 from ckan import plugins as p
 from ckan.lib import helpers as h
 from ckan.lib.helpers import json
+from shapely.geometry import asShape
+from ckan.lib.navl.dictization_functions import StopOnError, missing
 
 log = logging.getLogger(__name__)
 
@@ -67,10 +69,29 @@ def get_common_map_config():
     '''
     namespace = 'ckanext.spatial.common_map.'
     return dict([(k.replace(namespace, ''), v) for k, v in config.iteritems() if k.startswith(namespace)])
+
 def spatial_is_json(spatial_data):
     try:
         json_object = json.loads(spatial_data)
     except (ValueError, TypeError):
         return False
     return True
+
+def spatial_is_geojson(spatial_data):
+    try:
+        shape = asShape(spatial_data)
+        return shape.is_valid
+    except (ValueError, TypeError):
+        pass
+    return False
+
+'''
+metadata key
+'''
+
+def spatial_get_spatial_key():
+    return 'vdoj_spatial'
+
+def spatial_is_spatial_key(key):
+    return key == spatial_get_spatial_key()
 
