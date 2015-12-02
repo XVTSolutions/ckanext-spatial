@@ -65,3 +65,12 @@ Example of geojson
 
 * { "type": "MultiLineString", "coordinates": [ [ [100.0, 0.0], [101.0, 1.0] ], [ [102.0, 2.0], [103.0, 3.0] ] ] }
 
+
+Re-installation (postgresql/9.1)
+-------------------
+When re-initializing database after issuing paster db clean -c /etc/ckan/default/production.ini, it is necessary to issue: sudo -u postgres psql -d ckan_default -f postgres_resetup.sql
+Instead of issuing, sudo -u postgres psql -d ckan_default -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql 
+
+Then you can issue: sudo -u postgres psql -d ckan_default -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+
+Note: there are existing checks in postgres_resetup.sql
