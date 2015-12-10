@@ -68,9 +68,9 @@ Example of geojson
 
 Re-installation (postgresql/9.1)
 -------------------
-When re-initializing database after issuing paster db clean -c /etc/ckan/default/production.ini, it is necessary to issue: sudo -u postgres psql -d ckan_default -f postgres_resetup.sql
+When re-initializing database after issuing paster db clean -c /etc/ckan/default/production.ini, it is necessary to issue: sudo -u postgres psql -d ckan_default -f postgis_resetup.sql
 Instead of issuing, sudo -u postgres psql -d ckan_default -f /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql 
 
 Then you can issue: sudo -u postgres psql -d ckan_default -f /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
 
-Note: there are existing checks in postgres_resetup.sql
+Note: there are existing checks in postgis_resetup.sql
